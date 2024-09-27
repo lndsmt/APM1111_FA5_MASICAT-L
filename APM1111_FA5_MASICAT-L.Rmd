@@ -1,0 +1,289 @@
+---
+title: "FORMATIVE ASSESSMENT 5"
+author: "Lindsy Rossel C. Masicat"
+date: "2024-09-27"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(kableExtra)
+library(ggplot2)
+```
+
+## Problem 1
+### 8.18. List all samples of size n ¼ 2 that are possible (with replacement) from the population in Problem 8.17. Using R, plot the sampling distribution of the mean to show that \[ \mu_{\bar{x}} = \mu \], and show that \[ \sigma^2_{\bar{x}} = \frac{\sigma^2}{2} \]
+.
+```{r samples, echo=FALSE}
+population <- c(9, 12, 15)
+probabilities <- rep(1/3, 3) 
+
+samples <- expand.grid(population, population)
+colnames(samples) <- c("X1", "X2")
+
+
+samples$mean <- rowMeans(samples)
+samples$p_xbar <- rep(1/9, nrow(samples))
+
+samples$xbar_p_xbar <- samples$mean * samples$p_xbar
+samples$xbar2_p_xbar <- (samples$mean^2) * samples$p_xbar
+
+final_table <- data.frame(
+  X1 = samples$X1,
+  X2 = samples$X2,
+  mean = samples$mean,
+  xbar = samples$mean,
+  `p(xbar)` = samples$p_xbar,
+  `xbar * p(xbar)` = samples$xbar_p_xbar,
+  `xbar^2 * p(xbar)` = samples$xbar2_p_xbar
+)
+
+knitr::kable(final_table, 
+             col.names = c("X1", "X2", "mean", "xbar", "p(xbar)", "xbar * p(xbar)", "xbar^2 * p(xbar)"), 
+             caption = "Sampling Distribution Table")
+
+sampling_dist <- data.frame(mean = samples$mean)
+
+ggplot(sampling_dist, aes(x = mean)) +
+  geom_bar(stat = "count", fill = "steelblue") +
+  labs(title = "Sampling Distribution of the Mean",
+       x = "Sample Mean",
+       y = "Frequency")
+
+```
+
+## Problems 2
+### 8.21. A population consists of the four numbers 3, 7, 11, and 15. Consider all possible samples of size 2 that can be drawn with replacement from this population. Find (a) the population mean,(b) the population standard deviation, (c) the mean of the sampling distribution of means, and (d ) the standard deviation of the sampling distribution of means. Verify parts (c) and (d ) directly from (a) and (b) by using suitable formulas.
+
+### Population Mean and Standard Deviation
+
+The population consists of the numbers 3, 7, 11, and 15.
+
+### (a) Population Mean \( \mu \)
+The population mean is calculated as:
+$$ \mu = \frac{3 + 7 + 11 + 15}{4} = \frac{36}{4} = 9 $$
+
+### (b) Population Standard Deviation \( \sigma \)
+The population standard deviation is calculated as:
+$$\sigma = \sqrt{\frac{(3 - 9)^2 + (7 - 9)^2 + (11 - 9)^2 + (15 - 9)^2}{4}}$$
+First, compute the squared differences:
+$$(3 - 9)^2 = 36, \quad (7 - 9)^2 = 4, \quad (11 - 9)^2 = 4, \quad (15 - 9)^2 = 36$$
+Summing these values gives:
+$$36 + 4 + 4 + 36 = 80$$
+Now, divide by the number of elements:
+$$\sigma = \sqrt{\frac{80}{4}} = \sqrt{20} = 4.47$$
+
+### (c) Mean of the Sampling Distribution of Means \( \mu_{\bar{X}} \)
+
+Since we are sampling with replacement, the mean of the sampling distribution of means is equal to the population mean:
+$$\mu_{\bar{X}} = \mu = 9$$
+
+### (d) Standard Deviation of the Sampling Distribution of Means \( \sigma_{\bar{X}} \)
+
+The standard deviation of the sampling distribution of means is calculated as:
+$$\sigma_{\bar{X}} = \frac{\sigma}{\sqrt{n}} = \frac{4.47}{\sqrt{2}} = \frac{4.47}{1.414} = 3.16$$
+
+### Verification:
+The calculations confirm that:
+
+1. $$ \mu_{\bar{X}} = \mu = 9 $$
+2. $$\sigma_{\bar{X}} = \frac{\sigma}{\sqrt{n}} = 3.16 $$
+
+
+### 8.34. Find the probability that of the next 200 children born, (a) less than 40% will be boys, (b) between 43% and 57% will be girls, and (c) more than 54% will be boys. Assume equal probabilities for the births of boys and girls.
+
+We are given that the probability of a child being a boy is \( p = 0.5 \), and the number of births is \( n = 200 \). The number of boys \( X \) follows a binomial distribution:
+
+$$X \sim \text{Binomial}(n = 200, p = 0.5)$$
+
+The binomial distribution can be approximated by a normal distribution:
+
+$$X \sim N(\mu = np, \sigma^2 = np(1-p))$$
+
+The mean and standard deviation are:
+
+$$\mu = np = 200 \times 0.5 = 100$$
+$$\sigma^2 = np(1 - p) = 200 \times 0.5 \times 0.5 = 50$$
+$$\sigma = \sqrt{50} \approx 7.071$$
+
+---
+
+### (a) Probability that less than 40% will be boys
+
+We want to compute \( P(X < 0.40 \times 200) \), which translates to:
+
+$$P(X < 80)$$
+
+To approximate this using the normal distribution, we convert to the z-score:
+
+$$Z = \frac{X - \mu}{\sigma} = \frac{80 - 100}{7.071} = \frac{-20}{7.071} \approx -2.828$$
+
+Now, using the cumulative distribution function of the standard normal distribution:
+
+$$P(Z < -2.828) \approx 0.0023$$
+
+Thus, the probability that less than 40% will be boys is approximately:
+
+$$P(X < 80) \approx 0.0023$$
+
+---
+
+### (b) Probability that between 43% and 57% will be girls
+
+We want to compute \( P(0.43 \times 200 \leq X_{\text{girls}} \leq 0.57 \times 200) \), which translates to:
+
+$$P(86 \leq X_{\text{girls}} \leq 114)$$
+
+Since \( X_{\text{girls}} = 200 - X_{\text{boys}} \), we are actually looking for:
+
+$$P(86 \leq X_{\text{boys}} \leq 114)$$
+
+To compute this, we standardize both limits:
+
+For \( X = 86 \):
+
+$$Z = \frac{86 - 100}{7.071} = \frac{-14}{7.071} \approx -1.98$$
+
+For \( X = 114 \):
+
+$$Z = \frac{114 - 100}{7.071} = \frac{14}{7.071} \approx 1.98$$
+
+Thus, we compute the probability:
+
+$$P(-1.98 < Z < 1.98) = P(Z < 1.98) - P(Z < -1.98)$$
+
+From standard normal tables:
+
+$$P(Z < 1.98) \approx 0.9761, \quad P(Z < -1.98) \approx 0.0239$$
+
+So:
+
+$$P(-1.98 < Z < 1.98) = 0.9761 - 0.0239 = 0.9522$$
+
+Thus, the probability that between 43% and 57% will be girls is approximately:
+
+$$P(86 \leq X_{\text{girls}} \leq 114) \approx 0.9522$$
+
+---
+
+### (c) Probability that more than 54% will be boys
+
+
+We want to compute \( P(X > 0.54 \times 200) \), which translates to:
+
+
+$$P(X > 108)$$
+
+
+Standardize this value:
+
+
+$$Z = \frac{108 - 100}{7.071} = \frac{8}{7.071} \approx 1.13$$
+
+
+Now, using the cumulative distribution function:
+
+
+$$P(Z > 1.13) = 1 - P(Z < 1.13)$$
+
+
+From the standard normal table:
+
+
+$$P(Z < 1.13) \approx 0.8708$$
+
+
+So:
+
+
+$$P(Z > 1.13) = 1 - 0.8708 = 0.1292$$
+
+
+Thus, the probability that more than 54% will be boys is approximately:
+
+$$P(X > 108) \approx 0.1292$$
+
+
+---
+
+### Summary of Results
+
+- **(a)**: The probability that less than 40% of the next 200 children born will be boys is approximately \( 0.0023 \).
+- **(b)**: The probability that between 43% and 57% will be girls is approximately \( 0.9522 \).
+- **(c)**: The probability that more than 54% will be boys is approximately \( 0.1292 \).
+
+## Problem 3
+
+### 8.49 The credit hour distribution at Metropolitan Technological College is as follows:
+```{r table, echo=FALSE}
+x <- c(6, 9, 12, 15, 18)
+p_x <- c(0.1, 0.2, 0.4, 0.2, 0.1)
+
+data <- data.frame(x, p_x)
+
+kable(data, col.names = c("x", "p(x)")) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+
+mu <- sum(x * p_x)
+
+variance <- sum((x - mu)^2 * p_x)
+```
+
+Find \( \mu \) and \( \sigma^2 \). Give the 25 (with replacement) possible samples of size 2, their means, and their probabilities.
+
+
+The mean is `r mu`
+
+The mean \( \mu \) is calculated as:
+
+$$\mu = \sum{x \cdot p(x)} = (6 \cdot 0.1) + (9 \cdot 0.2) + (12 \cdot 0.4) + (15 \cdot 0.2) + (18 \cdot 0.1)$$
+
+$$\mu = 12$$
+
+The variance is `r variance`
+
+The variance \( \sigma^2 \) is calculated as:
+
+$$
+\sigma^2 = \sum{(x - \mu)^2 \cdot p(x)} = (6 - 12)^2 \cdot 0.1 + (9 - 12)^2 \cdot 0.2 + (12 - 12)^2 \cdot 0.4 + (15 - 12)^2 \cdot 0.2 + (18 - 12)^2 \cdot 0.1
+$$
+
+Substitute the differences:
+
+$$
+\sigma^2 = (-6)^2 \cdot 0.1 + (-3)^2 \cdot 0.2 + (0)^2 \cdot 0.4 + (3)^2 \cdot 0.2 + (6)^2 \cdot 0.1
+$$
+
+Now calculate the squares and multiply:
+
+$$
+\sigma^2 = 36 \cdot 0.1 + 9 \cdot 0.2 + 0 \cdot 0.4 + 9 \cdot 0.2 + 36 \cdot 0.1
+$$
+
+$$
+\sigma^2 = 3.6 + 1.8 + 0 + 1.8 + 3.6
+$$
+
+Finally, sum the values:
+
+$$
+\sigma^2 = 10.8
+$$
+
+
+The 25 (with replacement) possible samples of size 2, their means, and their probabilities.
+
+```{r table2, echo=FALSE}
+
+samples <- expand.grid(x, x)
+
+samples$Mean <- rowMeans(samples)
+
+samples$Probability <- p_x[match(samples$Var1, x)] * p_x[match(samples$Var2, x)]
+
+result <- samples[, c("Var1", "Var2", "Mean", "Probability")]
+colnames(result) <- c("Sample 1", "Sample 2", "Mean", "Probability")
+
+kable(result, digits = 4, caption = "Possible Samples of Size 2, Their Means, and Probabilities") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
